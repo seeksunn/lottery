@@ -2,6 +2,7 @@ pragma solidity >=0.6.6 < 0.8.0;
 contract Lottery {
     address public manager;
     address [] public players;
+    address payable public winner;
      
     constructor() public {
         manager = msg.sender;
@@ -15,12 +16,11 @@ contract Lottery {
     }
     function random() private view returns (uint) {
         bytes memory val;
-        val = abi.encodePacked(block.difficulty, now, players);
+        val = abi.encodePacked(block.difficulty, block.timestamp, players);
         return uint (keccak256(val));
     }
     function pickWinner() public checkForOnlyManager {
-        uint index = random() % players.length;
-        address payable winner;
+        uint index = random() % players.length;        
         winner = payable (players[index]);
         winner.transfer(address(this).balance);
         //clear array for next round
